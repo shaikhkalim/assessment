@@ -1,0 +1,127 @@
+USE [ShopBridge]
+GO
+/****** Object:  Table [dbo].[Items]    Script Date: 6/8/2021 1:29:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Items](
+	[ItemID] [int] IDENTITY(1,1) NOT NULL,
+	[ItemName] [nvarchar](200) NOT NULL,
+	[ItemDescriotion] [nvarchar](500) NOT NULL,
+	[ItemQuentity] [int] NOT NULL,
+	[ItemPrice] [decimal](18, 2) NOT NULL,
+	[ItemDiscountPercentage] [int] NOT NULL,
+	[ItemImageUrl] [nvarchar](500) NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[CreatedBy] [int] NOT NULL,
+	[CreatedDate] [datetime] NOT NULL,
+	[UpdateBy] [int] NULL,
+	[UpdatedDate] [datetime] NULL,
+ CONSTRAINT [PK_Items] PRIMARY KEY CLUSTERED 
+(
+	[ItemID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteItems]    Script Date: 6/8/2021 1:29:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteItems]   
+ @ID int  
+AS 
+BEGIN
+  
+ DELETE dbo.Items WHERE ItemID = @ID
+
+END
+ 
+GO
+/****** Object:  StoredProcedure [dbo].[getALLItems]    Script Date: 6/8/2021 1:29:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[getALLItems]   
+AS 
+BEGIN
+  
+ SELECT * 
+ FROM dbo.Items(NOLOCK)
+
+ END
+ 
+GO
+/****** Object:  StoredProcedure [dbo].[getItemsByID]    Script Date: 6/8/2021 1:29:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[getItemsByID]   
+ @ID int  
+AS 
+BEGIN
+  
+ SELECT * 
+ FROM dbo.Items(NOLOCK)
+ WHERE ItemID = @ID
+
+ END
+ 
+GO
+/****** Object:  StoredProcedure [dbo].[SaveItem]    Script Date: 6/8/2021 1:29:13 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SaveItem]  
+ @ItemID   int,  
+ @ItemName  nvarchar(200),  
+ @ItemDescriotion    nvarchar(500),  
+ @ItemQuentity     int,  
+ @ItemPrice    int,  
+ @ItemDiscountPercentage  int,  
+ @ItemImageUrl    nvarchar(500),  
+ @IsActive  bit ,
+ @CreatedBy  int ,
+ @CreatedDate  datetime = getdate,
+ @UpdateBy  int ,
+ @UpdatedDate  datetime = null 
+AS  
+ BEGIN TRY     
+  IF NOT EXISTS ( select * from dbo.Items where ItemID = @ItemID )  
+  BEGIN  
+   -- insert --  
+   INSERT INTO dbo.Items  
+      (  ItemName,  ItemDescriotion,  ItemQuentity,  ItemPrice, ItemDiscountPercentage,ItemImageUrl,
+   IsActive,CreatedBy,CreatedDate) 
+   VALUES(  @ItemName,  @ItemDescriotion,  @ItemQuentity,  @ItemPrice,  @ItemDiscountPercentage,@ItemImageUrl,
+   @IsActive,@CreatedBy,@CreatedDate)  
+  
+   SELECT @@IDENTITY  
+  END  
+  ELSE BEGIN  
+   -- update --  
+   UPDATE dbo.Items SET    
+   ItemName    = @ItemName,  
+   ItemDescriotion     = @ItemDescriotion,  
+   ItemQuentity    = @ItemQuentity,  
+   ItemPrice  = @ItemPrice  ,
+   ItemDiscountPercentage = @ItemDiscountPercentage,
+   ItemImageUrl = @ItemImageUrl,
+   IsActive = @IsActive,
+   CreatedBy = @CreatedBy,
+   CreatedDate = @CreatedDate,
+   UpdateBy =@UpdateBy,
+   UpdatedDate = @UpdatedDate
+   WHERE ItemID = @ItemID 
+  
+   SELECT @@ROWCOUNT  
+  END  
+ END TRY    
+ BEGIN CATCH    
+  THROW;  
+ END CATCH  
+GO

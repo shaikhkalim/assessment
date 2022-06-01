@@ -5,6 +5,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 CREATE TABLE [dbo].[Items](
 	[ItemID] [int] IDENTITY(1,1) NOT NULL,
 	[ItemName] [nvarchar](200) NOT NULL,
